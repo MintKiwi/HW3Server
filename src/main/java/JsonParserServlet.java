@@ -1,5 +1,6 @@
 
 import com.google.gson.Gson;
+import com.rabbitmq.client.Channel;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -8,10 +9,17 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+
 @WebServlet(name = "JsonParserServlet", value = "/JsonParserServlet")
 public class JsonParserServlet extends HttpServlet {
     private Gson gson = new Gson();
 
+    private RabbitMqChannelPool pool;
+    @Override
+    public void init(){
+        pool = new RabbitMqChannelPool(new RabbitMqChannelPoolFactory());
+
+    }
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("application/json");
@@ -36,17 +44,19 @@ public class JsonParserServlet extends HttpServlet {
                 sb.append(s);
 
             }
-            SwipeDetails swipeDetails = (SwipeDetails) gson.fromJson(sb.toString(), SwipeDetails.class);
 
-//            SwipeDetails swipeDetails = JSON.parseObject(sb.toString(), SwipeDetails.class);
+            SwipeDetails swipeDetails = gson.fromJson(sb.toString(), SwipeDetails.class);
+            swipeDetails.setLeftOrRight(urlParts[2]);
+
+
+
+
             ResponseMsg message = new ResponseMsg();
 
             String swiper = swipeDetails.getSwiper();
             String swipee = swipeDetails.getSwipee();
             String comment = swipeDetails.getComment();
-            System.out.println(swipee);
-            System.out.println(swiper);
-            System.out.println(comment);
+
 
             if (urlParts.length < 3 || (!urlParts[2].equals("left") && !urlParts[2].equals("right"))) {
                 rep(message, response, "Not found");
@@ -63,11 +73,18 @@ public class JsonParserServlet extends HttpServlet {
                 return;
             } else if (swipeDetails.getSwipee() != null && swipeDetails.getComment() != null && swipeDetails.getSwiper() != null) {
 
-                response.getOutputStream().print(gson.toJson(swipeDetails));
 
 
-                response.setStatus(HttpServletResponse.SC_CREATED);
-                response.getOutputStream().flush();
+
+
+
+                String msg = gson.toJson(swipeDetails);
+                Channel channel = pool.borrowObject();
+                channel.basicPublish("fanout", "", null, msg.getBytes());
+                if(channel != null) pool.returnObject(channel);
+
+
+
                 return;
 
 
@@ -88,6 +105,8 @@ public class JsonParserServlet extends HttpServlet {
             throws ServletException, IOException {
         processRequest(request, response);
     }
+
+
 
     public void rep(ResponseMsg message, HttpServletResponse response, String s) throws IOException {
         message.setMessage(s);

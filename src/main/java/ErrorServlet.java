@@ -20,9 +20,6 @@ public class ErrorServlet extends HttpServlet {
         Gson gson = new Gson();
         JsonParserServlet js = new JsonParserServlet();
         js.rep(message, response, "Not found");
-//        message.setMessage("Not found");
-//        response.getOutputStream().print(gson.toJson(message));
-//        response.setStatus(HttpServletResponse.SC_NOT_FOUND);
         return;
 
     }
