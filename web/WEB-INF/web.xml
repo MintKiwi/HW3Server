@@ -22,4 +22,16 @@
         <servlet-name>JsonParserServlet</servlet-name>
         <url-pattern>/swipe/*</url-pattern>
     </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>MatchServlet</servlet-name>
+        <url-pattern>/matches/*</url-pattern>
+        <url-pattern>/stats/*</url-pattern>
+    </servlet-mapping>
+    <servlet>
+        <servlet-name>MatchServlet</servlet-name>
+        <servlet-class>MatchServlet</servlet-class>
+    </servlet>
+
+
 </web-app>

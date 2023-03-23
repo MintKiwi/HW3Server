@@ -1,6 +1,7 @@
 
 import com.google.gson.Gson;
 import com.rabbitmq.client.Channel;
+import com.rabbitmq.client.MessageProperties;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -58,7 +59,7 @@ public class JsonParserServlet extends HttpServlet {
             String comment = swipeDetails.getComment();
 
 
-            if (urlParts.length < 3 || (!urlParts[2].equals("left") && !urlParts[2].equals("right"))) {
+            if (urlParts.length < 3 || (!urlParts[2].equals("left") && !urlParts[2].equals("right")) || !urlParts[1].equals("swipe")) {
                 rep(message, response, "Not found");
 
                 return;
@@ -80,7 +81,8 @@ public class JsonParserServlet extends HttpServlet {
 
                 String msg = gson.toJson(swipeDetails);
                 Channel channel = pool.borrowObject();
-                channel.basicPublish("fanout", "", null, msg.getBytes());
+                //the queue and exchange was already declared through the rabbitmq console, declare the message type to be the persistent type
+                channel.basicPublish("fanout", "", MessageProperties.MINIMAL_PERSISTENT_BASIC, msg.getBytes());
                 if(channel != null) pool.returnObject(channel);
 
 
@@ -103,6 +105,7 @@ public class JsonParserServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+
         processRequest(request, response);
     }
 
@@ -132,8 +135,13 @@ public class JsonParserServlet extends HttpServlet {
     }
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
-        res.getWriter().write("It works!");
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+
+
+
+
+
 
     }
 }
