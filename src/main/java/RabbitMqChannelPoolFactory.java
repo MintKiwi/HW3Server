@@ -17,7 +17,7 @@ public class RabbitMqChannelPoolFactory implements PooledObjectFactory<Channel> 
 
             ConnectionFactory factory = new ConnectionFactory();
 
-            factory.setHost("54.244.11.31");
+            factory.setHost("54.212.63.10");
             factory.setPort(5672);
             factory.setUsername("admin");
             factory.setPassword("admin");

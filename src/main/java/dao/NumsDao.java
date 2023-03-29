@@ -91,5 +91,42 @@ public class NumsDao {
         return null;
     }
 
+    //Get the Dislike record by fetching it from your MySQL instance.
+    public NumsPOJO getSwipeRecordySwiper(int swiper) throws SQLException {
+
+        String selectNumsPOJO = "SELECT (SELECT COUNT(*) FROM DisLikes WHERE swiper = ?) as NumDislikes, (SELECT COUNT(*) FROM Likes WHERE swiper = ?) as Numlikes;";
+        Connection connection = null;
+        PreparedStatement selectStmt = null;
+        ResultSet results = null;
+        try {
+            connection = dataSource.getConnection();
+            selectStmt = connection.prepareStatement(selectNumsPOJO);
+            selectStmt.setInt(1, swiper);
+            selectStmt.setInt(2, swiper);
+            results = selectStmt.executeQuery();
+            if (results.next()) {
+                int swiper1 = swiper;
+                int numdislike = results.getInt("NumDislikes");
+                int numslikes = results.getInt("Numlikes");
+                NumsPOJO numsPOJO = new NumsPOJO(swiper1, numslikes, numdislike);
+                return numsPOJO;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw e;
+        } finally {
+            if (connection != null) {
+                connection.close();
+            }
+            if (selectStmt != null) {
+                selectStmt.close();
+            }
+            if (results != null) {
+                results.close();
+            }
+        }
+        return null;
+    }
+
 
 }

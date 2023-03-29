@@ -64,7 +64,7 @@ public class SwipeDao {
      */
     public List<Integer> getSwipePOJOBySwiper(String swiper) throws SQLException {
         List<Integer> swipePOJOs = new ArrayList<Integer>();
-        String selectSwipePOJO = "SELECT Id, Swipee, Swiper FROM Swipe WHERE Swiper=?;";
+        String selectSwipePOJO = "SELECT Id, Swipee, Swiper FROM Likes WHERE Swiper=?;";
         Connection connection = null;
         PreparedStatement selectStmt = null;
         ResultSet results = null;

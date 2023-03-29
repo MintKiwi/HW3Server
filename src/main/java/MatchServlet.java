@@ -89,7 +89,8 @@ public class MatchServlet extends HttpServlet {
             }
             else if(urlParts[2].equals("stats") && urlParts[3].matches("\\d+")){
 
-                NumsPOJO numsPOJO = numsDao.getNumsPOJOBySwiper(Integer.parseInt(urlParts[3]));
+//                NumsPOJO numsPOJO = numsDao.getNumsPOJOBySwiper(Integer.parseInt(urlParts[3]));
+                NumsPOJO numsPOJO = numsDao.getSwipeRecordySwiper(Integer.parseInt(urlParts[3]));
                 if(numsPOJO != null){
                     response.getOutputStream().print(gson.toJson(numsPOJO));
 
